@@ -163,16 +163,24 @@ class SaleService
                 ]);
             }
 
-            $amount = (string) $data['amount'];
+            $amount = number_format((float) $data['amount'], 4, '.', '');
             if (bccomp($amount, '0', 4) <= 0) {
                 throw ValidationException::withMessages([
                     'amount' => ['Le montant du paiement doit être positif.'],
                 ]);
             }
 
-            if (bccomp($amount, (string) $sale->balance_due, 4) > 0) {
+            $balanceDue = number_format((float) $sale->balance_due, 4, '.', '');
+
+            // Si le montant reçu dépasse le solde (monnaie à rendre / écart flottant),
+            // on enregistre uniquement le solde restant.
+            if (bccomp($amount, $balanceDue, 4) > 0) {
+                $amount = $balanceDue;
+            }
+
+            if (bccomp($amount, '0', 4) <= 0) {
                 throw ValidationException::withMessages([
-                    'amount' => ['Le paiement dépasse le solde restant.'],
+                    'amount' => ['Aucun solde restant à encaisser.'],
                 ]);
             }
 
