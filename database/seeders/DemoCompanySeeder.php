@@ -72,15 +72,34 @@ class DemoCompanySeeder extends Seeder
             ],
         );
 
-        $stock->users()->syncWithoutDetaching([
-            $admin->id => [
-                'assigned_by' => $admin->id,
-                'can_view' => true,
-                'can_manage_stock' => true,
-                'can_sell' => true,
-                'is_default' => true,
-                'assigned_at' => now(),
+        $depot = Stock::query()->withoutGlobalScopes()->updateOrCreate(
+            [
+                'company_id' => $company->id,
+                'code' => 'DEPOT',
             ],
+            [
+                'name' => 'Dépôt secondaire',
+                'description' => 'Entrepôt / dépôt',
+                'address' => 'Bujumbura',
+                'is_active' => true,
+                'created_by' => $admin->id,
+            ],
+        );
+
+        $stockAssignment = [
+            'assigned_by' => $admin->id,
+            'can_view' => true,
+            'can_manage_stock' => true,
+            'can_sell' => true,
+            'assigned_at' => now(),
+        ];
+
+        $stock->users()->syncWithoutDetaching([
+            $admin->id => [...$stockAssignment, 'is_default' => true],
+        ]);
+
+        $depot->users()->syncWithoutDetaching([
+            $admin->id => [...$stockAssignment, 'is_default' => false],
         ]);
 
         CompanySetting::query()->withoutGlobalScopes()->updateOrCreate(
