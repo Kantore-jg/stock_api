@@ -26,7 +26,7 @@ class DemoCompanySeeder extends Seeder
         $bif = Currency::query()->where('code', 'BIF')->firstOrFail();
 
         $company = Company::query()->updateOrCreate(
-            ['email' => 'contact@kanto-stock.demo'],
+            ['email' => 'codewithkantox@gmail.com'],
             [
                 'name' => 'Kanto Stock Demo',
                 'legal_name' => 'Kanto Stock Demo SARL',
@@ -45,10 +45,10 @@ class DemoCompanySeeder extends Seeder
         $admin = User::query()->updateOrCreate(
             [
                 'company_id' => $company->id,
-                'email' => 'admin@kanto-stock.demo',
+                'email' => 'codewithkantox@gmail.com',
             ],
             [
-                'name' => 'Jean Lionel',
+                'name' => 'Jean Gildas',
                 'phone' => '+257 79 00 00 00',
                 'password' => 'password',
                 'is_active' => true,
