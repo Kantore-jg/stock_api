@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\TenantCompanyController;
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashRegisterController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Api\StockItemController;
 use App\Http\Controllers\Api\StockMovementController;
 use App\Http\Controllers\Api\StockUserController;
 use App\Http\Controllers\Api\UnitController;
+use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\SetPermissionsTeamId;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +35,13 @@ Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me'])->middleware(SetPermissionsTeamId::class);
     });
+});
+
+Route::middleware(['auth:sanctum', EnsureSuperAdmin::class])->prefix('admin')->group(function () {
+    Route::get('companies', [TenantCompanyController::class, 'index']);
+    Route::post('companies', [TenantCompanyController::class, 'store']);
+    Route::get('companies/{company}', [TenantCompanyController::class, 'show']);
+    Route::put('companies/{company}', [TenantCompanyController::class, 'update']);
 });
 
 Route::middleware(['auth:sanctum', SetPermissionsTeamId::class])->group(function () {

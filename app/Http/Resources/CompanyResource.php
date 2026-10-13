@@ -28,6 +28,7 @@ class CompanyResource extends JsonResource
             'default_currency_id' => $this->default_currency_id,
             'default_currency' => new CurrencyResource($this->whenLoaded('defaultCurrency')),
             'is_active' => $this->is_active,
+            'users_count' => $this->whenCounted('users'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

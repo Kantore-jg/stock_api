@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'is_active' => $this->is_active,
+            'is_super_admin' => (bool) $this->is_super_admin,
             'company' => new CompanyResource($this->whenLoaded('company')),
             'stocks' => StockResource::collection($this->whenLoaded('stocks')),
             'roles' => $this->when(

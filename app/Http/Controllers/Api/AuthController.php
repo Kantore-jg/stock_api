@@ -27,7 +27,9 @@ class AuthController extends Controller
             ]);
         }
 
-        app(PermissionRegistrar::class)->setPermissionsTeamId($user->company_id);
+        if ($user->company_id) {
+            app(PermissionRegistrar::class)->setPermissionsTeamId($user->company_id);
+        }
 
         $deviceName = $request->string('device_name')->toString() ?: 'api-token';
         $token = $user->createToken($deviceName)->plainTextToken;
@@ -44,7 +46,9 @@ class AuthController extends Controller
     public function me(Request $request): UserResource
     {
         $user = $request->user();
-        app(PermissionRegistrar::class)->setPermissionsTeamId($user->company_id);
+        if ($user->company_id) {
+            app(PermissionRegistrar::class)->setPermissionsTeamId($user->company_id);
+        }
         $user->load(['company.defaultCurrency', 'stocks']);
 
         return new UserResource($user);
