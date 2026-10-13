@@ -28,7 +28,7 @@ class ProductController extends Controller
                 });
             })
             ->latest()
-            ->paginate(20);
+            ->paginate((int) $request->integer('per_page', 20));
 
         return ProductResource::collection($products);
     }

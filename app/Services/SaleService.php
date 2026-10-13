@@ -291,11 +291,12 @@ class SaleService
             $quantity = (string) $line['quantity'];
             $unitPrice = (string) ($line['unit_price'] ?? $product->selling_price);
             $discount = (string) ($line['discount_amount'] ?? 0);
-            $taxRate = (string) ($line['tax_rate'] ?? $product->productLabel->default_tax_rate);
 
-            if ($product->productLabel->is_tax_exempt) {
-                $taxRate = '0.0000';
-            }
+            // TVA toujours prise depuis le produit (étiquette), jamais depuis la vente.
+            $label = $product->productLabel;
+            $taxRate = $label && ! $label->is_tax_exempt
+                ? (string) $label->default_tax_rate
+                : '0.0000';
 
             $gross = bcmul($quantity, $unitPrice, 4);
             $lineSubtotal = bcsub($gross, $discount, 4);
