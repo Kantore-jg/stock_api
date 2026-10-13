@@ -25,7 +25,8 @@ class ExpenseController extends Controller
         $expenses = Expense::query()
             ->with(['category', 'currency', 'paymentMethod'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
-            ->latest('expense_date')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(20);
 
         return ExpenseResource::collection($expenses);

@@ -33,7 +33,8 @@ class StockMovementController extends Controller
                         ->orWhere('destination_stock_id', $stockId);
                 });
             })
-            ->latest('document_date')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(20);
 
         return StockMovementResource::collection($movements);

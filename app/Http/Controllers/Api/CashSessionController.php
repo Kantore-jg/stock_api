@@ -31,7 +31,8 @@ class CashSessionController extends Controller
             ->whereHas('cashRegister', fn ($query) => $query->where('company_id', $companyId))
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->integer('cash_register_id'), fn ($query, int $id) => $query->where('cash_register_id', $id))
-            ->latest('opened_at')
+            ->orderByDesc('opened_at')
+            ->orderByDesc('id')
             ->paginate(20);
 
         return CashSessionResource::collection($sessions);

@@ -43,7 +43,8 @@ class SaleController extends Controller
                         });
                 });
             })
-            ->latest('sale_date')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(20);
 
         return SaleResource::collection($sales);

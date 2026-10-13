@@ -26,7 +26,8 @@ class PaymentController extends Controller
         $payments = Payment::query()
             ->with(['paymentMethod', 'currency'])
             ->when($request->integer('sale_id'), fn ($query, int $saleId) => $query->where('sale_id', $saleId))
-            ->latest('payment_date')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(20);
 
         return PaymentResource::collection($payments);

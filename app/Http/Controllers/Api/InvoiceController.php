@@ -31,7 +31,8 @@ class InvoiceController extends Controller
                         });
                 });
             })
-            ->latest('invoice_date')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(20);
 
         return InvoiceResource::collection($invoices);
