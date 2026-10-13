@@ -24,10 +24,25 @@ class SaleController extends Controller
         abort_unless($request->user()->can('sales.view'), 403);
 
         $sales = Sale::query()
-            ->with(['customer', 'stock', 'currency'])
+            ->with(['customer', 'stock', 'currency', 'invoice'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->integer('stock_id'), fn ($query, int $stockId) => $query->where('stock_id', $stockId))
             ->when($request->integer('customer_id'), fn ($query, int $customerId) => $query->where('customer_id', $customerId))
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->string('search')->toString();
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('invoice_number', 'like', "%{$search}%")
+                        ->orWhere('notes', 'like', "%{$search}%")
+                        ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                            $customerQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%")
+                                ->orWhere('code', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('invoice', function ($invoiceQuery) use ($search) {
+                            $invoiceQuery->where('invoice_number', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->latest('sale_date')
             ->paginate(20);
 

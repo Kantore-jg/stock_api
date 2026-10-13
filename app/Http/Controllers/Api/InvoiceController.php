@@ -15,8 +15,22 @@ class InvoiceController extends Controller
         abort_unless($request->user()->can('invoices.view'), 403);
 
         $invoices = Invoice::query()
-            ->with(['currency', 'sale'])
+            ->with(['currency', 'sale.customer', 'sale.stock'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->string('search')->toString();
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('invoice_number', 'like', "%{$search}%")
+                        ->orWhere('customer_name_snapshot', 'like', "%{$search}%")
+                        ->orWhereHas('sale', function ($saleQuery) use ($search) {
+                            $saleQuery->where('invoice_number', 'like', "%{$search}%")
+                                ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                                    $customerQuery->where('name', 'like', "%{$search}%")
+                                        ->orWhere('phone', 'like', "%{$search}%");
+                                });
+                        });
+                });
+            })
             ->latest('invoice_date')
             ->paginate(20);
 

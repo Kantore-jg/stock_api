@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\RoleName;
+use App\Models\CashRegister;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\CompanySetting;
@@ -198,6 +199,18 @@ class DemoCompanySeeder extends Seeder
                 'min_stock_level' => 2,
                 'is_active' => true,
                 'created_by' => $admin->id,
+            ],
+        );
+
+        CashRegister::query()->withoutGlobalScopes()->updateOrCreate(
+            [
+                'company_id' => $company->id,
+                'stock_id' => $stock->id,
+                'name' => 'Caisse principale',
+            ],
+            [
+                'currency_id' => $bif->id,
+                'is_active' => true,
             ],
         );
     }
